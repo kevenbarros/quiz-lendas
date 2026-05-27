@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { db } from '../firebase'
 import {
   collection, addDoc, updateDoc, deleteDoc,
@@ -95,9 +96,28 @@ export default function Admin() {
     }
   }
 
+  const qrRef = useRef(null)
+  const siteUrl = window.location.origin
+
+  function printQR() {
+    const svg = qrRef.current?.querySelector('svg')
+    if (!svg) return
+    const svgData = new XMLSerializer().serializeToString(svg)
+    const win = window.open('', '_blank')
+    win.document.write(`
+      <html><head><title>QR Code - Quiz Compliance</title>
+      <style>body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;margin:0;}
+      h2{margin-bottom:8px;}p{color:#666;margin-bottom:24px;}</style></head>
+      <body><h2>Quiz Compliance - Escape Box</h2><p>${siteUrl}</p>${svgData}
+      <script>setTimeout(()=>window.print(),300)<\/script></body></html>
+    `)
+    win.document.close()
+  }
+
   const tabs = [
     { key: 'questions', label: 'Perguntas' },
     { key: 'config', label: 'Config' },
+    { key: 'qrcode', label: 'QR Code' },
     { key: 'sessions', label: 'Sessoes' },
   ]
 
@@ -324,6 +344,37 @@ export default function Admin() {
               )}
             </div>
           </>
+        )}
+
+        {tab === 'qrcode' && (
+          <div className="bg-white rounded-xl p-6 shadow-sm text-center">
+            <h3 className="font-semibold text-slate-700 mb-1">
+              QR Code do Quiz
+            </h3>
+            <p className="text-slate-400 text-sm mb-6">
+              Imprima e coloque na Escape Box
+            </p>
+
+            <div ref={qrRef} className="flex justify-center mb-4">
+              <QRCodeSVG
+                value={siteUrl}
+                size={220}
+                level="H"
+                includeMargin
+              />
+            </div>
+
+            <p className="text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-lg mb-6 font-mono break-all">
+              {siteUrl}
+            </p>
+
+            <button
+              onClick={printQR}
+              className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium"
+            >
+              Imprimir QR Code
+            </button>
+          </div>
         )}
 
         {tab === 'sessions' && (
