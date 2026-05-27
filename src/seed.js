@@ -176,6 +176,7 @@ async function seed() {
     totalRounds: 4,
     threshold: 80,
     secretCode: 'COMPL1ANC3',
+    timePerQuestion: 30,
   })
   console.log('Config salva!')
   console.log(`Total: ${questions.length} perguntas cadastradas.`)

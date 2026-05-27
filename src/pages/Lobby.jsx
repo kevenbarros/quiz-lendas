@@ -5,6 +5,7 @@ import {
   doc, collection, onSnapshot, updateDoc,
   getDocs, getDoc
 } from 'firebase/firestore'
+import MagicRings from '../components/MagicRings'
 
 export default function Lobby() {
   const { sessionId } = useParams()
@@ -83,6 +84,7 @@ export default function Lobby() {
       status: 'playing',
       currentRound: 0,
       totalRounds,
+      timePerQuestion: config.timePerQuestion || 30,
       questionIds: selected,
     })
   }
@@ -95,35 +97,59 @@ export default function Lobby() {
 
   const currentPlayer = players.find((p) => p.id === playerId)
   const allReady = players.length >= 2 && players.every((p) => p.ready)
+  const readyCount = players.filter((p) => p.ready).length
 
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
-        <h2 className="text-xl font-bold text-slate-800 mb-1">
-          Sala de Espera
-        </h2>
-        <p className="text-slate-400 text-sm mb-6">
-          {players.length} jogador(es) na sala
+    <div className="game-bg flex items-center justify-center p-4">
+      <div className="absolute inset-0 z-0">
+        <MagicRings color="#7c3aed" colorTwo="#06b6d4" speed={0.5} ringCount={4} opacity={0.3} baseRadius={0.18} radiusStep={0.1} />
+      </div>
+
+      <div className="glass-card p-8 w-full max-w-sm text-center fade-in-up relative z-10">
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center">
+          <span className="text-2xl">⚔️</span>
+        </div>
+
+        <h2 className="text-xl font-bold text-white mb-1">Sala de Espera</h2>
+        <p className="text-white/30 text-sm mb-6">
+          {readyCount}/{players.length} prontos
         </p>
 
-        <div className="space-y-2 mb-6">
+        <div className="space-y-2 mb-6 stagger">
           {players.map((p) => (
             <div
               key={p.id}
-              className={`flex items-center justify-between px-4 py-3 rounded-xl ${
+              className={`fade-in-up flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
                 p.id === playerId
-                  ? 'bg-blue-50 border border-blue-200'
-                  : 'bg-slate-50'
+                  ? 'bg-cyan-500/10 border border-cyan-500/30'
+                  : 'bg-white/5 border border-white/5'
               }`}
             >
-              <span className="font-medium text-slate-700">{p.name}</span>
-              <span
-                className={`text-sm font-semibold ${
-                  p.ready ? 'text-green-600' : 'text-slate-400'
-                }`}
-              >
-                {p.ready ? 'Pronto!' : 'Aguardando...'}
-              </span>
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                    p.ready
+                      ? 'bg-green-500/20 text-green-400'
+                      : 'bg-white/10 text-white/40'
+                  }`}
+                >
+                  {p.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="font-medium text-white/90">{p.name}</span>
+              </div>
+              {p.ready ? (
+                <span className="text-xs font-bold text-green-400 bg-green-500/10 px-2.5 py-1 rounded-full pulse-ring">
+                  PRONTO
+                </span>
+              ) : (
+                <span className="text-xs text-white/30">
+                  <span className="inline-flex gap-0.5">
+                    <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                  </span>
+                </span>
+              )}
             </div>
           ))}
         </div>
@@ -131,20 +157,25 @@ export default function Lobby() {
         {!currentPlayer?.ready ? (
           <button
             onClick={handleReady}
-            className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold text-lg active:scale-95 transition-transform"
+            className="glow-btn w-full py-3.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold text-lg tracking-wide"
           >
-            Estou Pronto!
+            ESTOU PRONTO!
           </button>
         ) : (
-          <div className="text-slate-500 text-sm">
-            {allReady
-              ? 'Iniciando o jogo...'
-              : 'Aguardando outros jogadores...'}
+          <div className="text-white/40 text-sm py-2">
+            {allReady ? (
+              <span className="text-cyan-400 font-semibold flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
+                Iniciando...
+              </span>
+            ) : (
+              'Aguardando outros jogadores...'
+            )}
           </div>
         )}
 
         {players.length < 2 && (
-          <p className="text-xs text-slate-400 mt-4">
+          <p className="text-xs text-white/20 mt-4">
             Minimo 2 jogadores para comecar
           </p>
         )}

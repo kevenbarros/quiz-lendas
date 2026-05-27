@@ -5,6 +5,7 @@ import {
   collection, query, where, getDocs, addDoc,
   doc, setDoc, serverTimestamp, getDoc
 } from 'firebase/firestore'
+import MagicRings from '../components/MagicRings'
 
 export default function Home() {
   const [name, setName] = useState('')
@@ -62,29 +63,57 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
-        <div className="text-5xl mb-4">🔒</div>
-        <h1 className="text-2xl font-bold text-slate-800 mb-1">Quiz Compliance</h1>
-        <p className="text-slate-500 mb-6 text-sm">Escape Box Challenge</p>
-
-        <input
-          type="text"
-          placeholder="Seu nome"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none text-center text-lg mb-4"
-          maxLength={20}
-          disabled={loading}
+    <div className="game-bg flex items-center justify-center p-4">
+      <div className="absolute inset-0 z-0">
+        <MagicRings
+          color="#7c3aed"
+          colorTwo="#06b6d4"
+          speed={0.6}
+          ringCount={5}
+          opacity={0.4}
+          baseRadius={0.2}
+          radiusStep={0.12}
         />
+      </div>
+
+      <div className="glass-card p-8 w-full max-w-sm text-center fade-in-up relative z-10">
+        <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center text-4xl">
+          🔒
+        </div>
+
+        <h1 className="text-3xl font-extrabold neon-text mb-1">
+          Quiz Compliance
+        </h1>
+        <p className="text-white/40 mb-8 text-sm tracking-widest uppercase">
+          Escape Box Challenge
+        </p>
+
+        <div className="relative mb-5">
+          <input
+            type="text"
+            placeholder="Digite seu nome"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+            className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white text-center text-lg placeholder-white/25 outline-none focus:border-cyan-500/50 focus:bg-white/8 transition-all"
+            maxLength={20}
+            disabled={loading}
+          />
+        </div>
 
         <button
           onClick={handleJoin}
           disabled={!name.trim() || loading}
-          className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
+          className="glow-btn w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold text-lg tracking-wide"
         >
-          {loading ? 'Entrando...' : 'Entrar'}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Entrando...
+            </span>
+          ) : (
+            'ENTRAR NA ARENA'
+          )}
         </button>
       </div>
     </div>

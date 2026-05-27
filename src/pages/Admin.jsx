@@ -12,6 +12,7 @@ export default function Admin() {
     totalRounds: 4,
     threshold: 80,
     secretCode: '1234',
+    timePerQuestion: 30,
   })
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState({
@@ -188,6 +189,27 @@ export default function Admin() {
                   min="1"
                   max="100"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Tempo por Pergunta (segundos)
+                </label>
+                <input
+                  type="number"
+                  value={config.timePerQuestion}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      timePerQuestion: parseInt(e.target.value) || 10,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                  min="5"
+                  max="120"
+                />
+                <p className="text-xs text-slate-400 mt-1">
+                  Se o tempo esgotar, a resposta e marcada como incorreta
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
